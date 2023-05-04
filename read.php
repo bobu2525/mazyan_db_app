@@ -26,17 +26,18 @@ $sql_game_results = 'SELECT u.name, COUNT(g.id) AS hanchan_count, SUM(g.score) A
     COUNT(CASE WHEN g.yakuman = 1 THEN 1 END) AS yakuman_count
     FROM userstable u 
     LEFT JOIN gameresulttable g ON u.id = g.user_id
-    GROUP BY u.id, u.name';
+    GROUP BY u.id';
 $stmt_game_results = $pdo->query($sql_game_results);
 $records = $stmt_game_results->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>結果入力</title>
+    <title>麻雀得点管理アプリ武君</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fontsの読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
@@ -47,198 +48,65 @@ $records = $stmt_game_results->fetchAll(PDO::FETCH_ASSOC);
             <a href="index.php">麻雀得点管理アプリ武君</a>
         </nav>
     </header>
-    <tbody>
-    <form action="game_result.php" method="post" class="registration-form">
-      
-
-    <table>
-  <thead>
-    <tr>
-      <th colspan="2">結果入力</th>
- 
-    </tr>
-   
-    <tr>
-    <th>開催日</th>
-    
-      <th><input type="date" name="date" value="<?php echo date('Y-m-d'); ?>" required></th>
-
-  
-      </tr>
-<tr>
-      
-<td>プレイヤー人数</td>
-      <td><!-- プレイヤー人数選択用のセレクトボックス -->
-        <label for="player_count">プレイヤー:</label>
-        <select name="player_count" id="player_count">
-          <option value="3">3人</option>
-          <option value="4">4人</option>
-        </select></td>
-</tr>
-     
-<tr>
-      
-<td>半チャン回数</td>
-
-
-
-<td>
-  <form id="half_count_form" action="game_result.php" method="post">
-  <script>
-    function resetHalfCount() {
-      const halfCountInput = document.getElementById("half_count");
-      halfCountInput.value = 0;
-      // Add any other logic you want to reset here
-    }
-  </script>
-    <?php
-    if (session_status() == PHP_SESSION_NONE) {
-      session_start();
-      error_reporting(E_ERROR | E_PARSE);
-    }
-    error_reporting(E_ERROR | E_PARSE);
-
-   // 前回の半荘回数を取得
-   $prevCount = isset($_SESSION["half_count"]) ? $_SESSION["half_count"] : 0;
-
-   // 半荘回数を更新
-   if(isset($_POST['reset'])) {
-     $currentCount = 0;
-     $_SESSION["half_count"] = $currentCount;
-   } else {
-     $currentCount = $prevCount + 1;
-     $_SESSION["half_count"] = $currentCount;
-   }
-
-   // フォームに表示する
-   echo '<input type="number" name="half_count" id="half_count" value="' . $currentCount . '" required>';
-   ?>
-   <button type="button" onclick="document.getElementById('half_count_form').reset(); document.getElementById('half_count').value='0';">リセット</button>
- </form>
-</td>
-     </th>
-    
-   </td>
-</tr>
- </thead>
- <tbody>
-
- <tr>
-       <td>箱代金</td>
-       <td><!-- プレイヤー人数選択用のセレクトボックス -->
-  
-       <select name="hako_fee" id="hako_fee">
-         <option value="3">100円</option>
-         <option value="4">200円</option>
-       </select></td>
-   </tr>
-
-   <tr>
-       <td>チップ</td>
-       <td><!-- プレイヤー人数選択用のセレクトボックス -->
-  
-       <select name="chip_fee" id="chip_fee">
-         <option value="3">100円</option>
-         <option value="4">200円</option>
-       </select></td>
-   </tr>
-
-   <tr>
-       <td>やきとり </td>
-       <td><!-- プレイヤー人数選択用のセレクトボックス -->
-
-       <select name="yakitori_fee" id="yakitori_fee">
-         <option value="3">100円</option>
-         <option value="4">200円</option>
-       </select></td>
-   </tr>
-
- <tr>
-       <td>役満祝儀 </td>
-       <td><!-- プレイヤー人数選択用のセレクトボックス -->
- 
-       <select name="yakuman_fee" id="yakuman_fee">
-         <option value="3">100円</option>
-         <option value="4">200円</option>
-       </select></td>
-   </tr>
-
-   <tr>
-       <td> <div class="button-container">
-   <button type="submit" form="registration-form" class="btn">書き込み</button>
-   
-</div>  </td>
-       <td><a href="read.php" class="btn">戻る</a></td>
-   </tr>
- </tbody>
-</table>
-
-     
-
-       <table>
-           <thead>
-               <tr>
-                   <th>メンバー</th>
-                   <th>ユーザー名</th>
-                   <th>得点</th>
-                   <th>順位</th>
-                   <th>焼き鳥</th>
-                    <th>役満</th>
-                <th></th>
-            </tr>
-        </thead>
-        <select name="memberid<?= $i ?>" required>
-        <?php for ($i = 1; $i <= 4; $i++) : ?>
-    <tr>
-        <td>メンバー<?= $i ?></td>
-        <td>
-            <select name="memberid<?= $i ?>" required>
-                <option disabled selected value="">選択してください</option>
-                <?php foreach ($members as $member) : ?>
-                    <option value="<?= $member['id'] ?>"><?= $member['name'] ?></option>
-                <?php endforeach; ?>
-            </select>
-        </td>
+    <main>
+    <section>
+    <h1>メニュー</h1>
+        <table class="menu">
+            <tbody>
+                <tr>
+                  <td>
+                        <h1>通算成績</h1>
+                        <br>
+                        <br>
                     </td>
-            <td>
-                <input type="number" name="tokuten<?= $i ?>" min="0" max="100000000" required>
-            </td>
-            <td>
-                <select name="rank<?= $i ?>" required>
-                    <option disabled selected value="">選択してください</option>
-                    <?php for ($j = 1; $j <= 4; $j++) : ?>
-                        <option value="<?= $j ?>"><?= $j ?>位</option>
-                    <?php endfor; ?>
-                </select>
-            </td>
-            <td>
-                <select name="hako<?= $i ?>" required>
-                    <option value="1">あり</option>
-                    <option value="0">なし</option>
-                </select>
-            </td>
-            <td>
-    <select name="yakumanid<?= $i ?>">
-        <option disabled selected value="">選択してください</option>
-        <?php foreach ($yakumans as $yakuman) : ?>
-            <option value="<?= $yakuman['yakumanid'] ?>"><?= $yakuman['yakuman_name'] ?></option>
-        <?php endforeach; ?>
-    </select>
-</td>
+                    <td>
+                        <a href="game_result.php" class="btn">ゲーム内容設定</a>
+                        <br>
+                        <hr>
+                        <a href="kensaku.php" class="btn">成績</a>
+                        <br>
+                        <hr>
+                        <!-- 新規メンバー登録リンクを追加 -->
+                        <a href="register_member.php" class="btn">新規メンバー登録</a>
+                        <br>
+                        <hr>
+                        <a href="index.php" class="btn">もどれ</a>
+                        <br>
+                    </td>
+                    
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <h1>通算成績</h1>
+<table class="products-table">
+    <tr>
+        <th>メンバー</th>
+        <th>総半チャン回数</th>
+        <th>トータル金額</th>
+        <th>１位回数</th>
+        <th>箱回数</th>
+        <th>焼き鳥回数</th>
+        <th>役満回数</th>
+    </tr>
+    <?php foreach ($records as $record) { ?>
+        <tr>
+            <td><?php echo $record['name']; ?></td>
+            <td><?php echo $record['hanchan_count']; ?></td>
+            <td><?php echo $record['total_score']; ?></td>
+            <td><?php echo $record['first_place_count']; ?></td>
+            <td><?php echo $record['bako_count']; ?></td>
+            <td><?php echo $record['yakitori_count']; ?></td>
+            <td><?php echo $record['yakuman_count']; ?></td>
         </tr>
-    <?php endfor; ?>
-</tbody>
-    </table>
-    
-    </form>
-
-<style>
-    .button-container {
-        display: flex;
-        justify-content: center;
-        gap: 16px;
-        margin-top: 16px;
-    }
-</style>
+    <?php } ?>
+</table>
+        </div>
+    </article>
+    <a href="index.php" class="btn">もどれ</a>
+</main>
+<footer>
+    <p>&copy; 麻雀得点管理APP武君 All rights reserved.</p>
+</footer>
 </body>
 </html>

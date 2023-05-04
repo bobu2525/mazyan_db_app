@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="css/style.css">
 	<meta charset="UTF-8">
 	<title>送信完了</title>
 </head>
