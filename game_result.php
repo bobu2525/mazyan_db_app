@@ -201,7 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <table>
               <thead>
                   <tr>
-                      <th>メンー</th>
+                      <th>メー</th>
                       <th>ユーザー名</th>
                       <th>得点</th>
                       <th>順位</th>
